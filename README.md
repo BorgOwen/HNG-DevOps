@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 ### **4. Run the Application**
 ```bash
-python math_api.py
+python app.py
 ```
 The API will be available at:
 ```bash
@@ -87,12 +87,14 @@ Ensure you have the following installed:
 - Flask
 - Flask-CORS
 - Requests
-- Ngrok
+- Ngrok for public access endpoints
 
 Install required dependencies using:
 ```bash
 pip install flask flask-cors requests
-```
+
+```bash
+choco install ngrok
 
 ---
 
