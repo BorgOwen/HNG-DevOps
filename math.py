@@ -1,88 +1,94 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+import math
 import requests
 
 app = Flask(__name__)
 CORS(app)
 
 # ---- Number Property Checks ----
-def is_armstrong(n):
-    """Check if a number is an Armstrong number."""
-    digits = [int(d) for d in str(abs(n))]  # Handle negative numbers by using absolute value
-    power = len(digits)
-    return sum(d ** power for d in digits) == n
-
 def is_prime(n):
     """Check if a number is prime."""
-    if n < 2:
+    if n < 2 or not n.is_integer():
         return False
-    for i in range(2, int(n ** 0.5) + 1):
+    n = int(n)
+    for i in range(2, int(math.sqrt(n)) + 1):
         if n % i == 0:
             return False
     return True
 
 def is_perfect(n):
     """Check if a number is a perfect number (sum of proper divisors equals the number)."""
-    if n < 2:
+    if not n.is_integer():
         return False
-    divisors = [i for i in range(1, abs(n) // 2 + 1) if n % i == 0]  # Use absolute value for divisors
-    return sum(divisors) == n
+    n = int(n)
+    return sum(i for i in range(1, n) if n % i == 0) == n
 
-# ---- Helper Functions ----
-def digit_sum(n):
-    """Calculate the sum of digits of a number."""
-    return sum(int(d) for d in str(abs(n)))  # Handle negative numbers by using absolute value
+def is_armstrong(n):
+    """Check if a number is an Armstrong number."""
+    if not n.is_integer():
+        return False
+    digits = [int(d) for d in str(abs(int(n)))]
+    return sum(d ** len(digits) for d in digits) == int(n)
 
-def fetch_fun_fact(number):
-    """Fetch a fun fact from the Numbers API."""
-    url = f"http://numbersapi.com/{number}/math"
+# ---- API Routes ----
+@app.route('/')
+def home():
+    return "Welcome to the Number Classification API! Use /api/classify-number?number=<your_number> to classify a number."
+
+@app.route('/api/classify-number', methods=['GET'])
+def classify_number():
+    number = request.args.get('number')
+
+    # Ensure number is included in the error response
     try:
-        response = requests.get(url, timeout=5)  # Avoid infinite waiting
-        response.raise_for_status()  # Raise an error for bad responses (4xx, 5xx)
-        return response.text
-    except requests.RequestException:
-        return "No fun fact found."
+        number = float(number)  # Accept both integers and floats
+    except (ValueError, TypeError):
+        return jsonify({"number": number, "error": True, "message": "Invalid number format"}), 400 
 
-# ---- Main Processing Function ----
-def get_math_facts(number):
-    """Generate number properties and fetch a fun fact."""
     properties = []
-    
-    if is_armstrong(number):
-        properties.append("armstrong")
 
-    properties.append("even" if number % 2 == 0 else "odd")
-
-    return {
-        "number": number,
-        "is_prime": is_prime(number),
-        "is_perfect": is_perfect(number),
-        "properties": properties,
-        "digit_sum": digit_sum(number),
-        "fun_fact": fetch_fun_fact(number)
+    # Classify the number based on various properties
+    classifications = {
+        "prime": is_prime(number),
+        "perfect": is_perfect(number),
+        "armstrong": is_armstrong(number),
+        "even": number % 2 == 0,
+        "odd": number % 2 != 0
     }
 
-# ---- API Route ----
-@app.route('/math/<number>', methods=['GET'])
-def math_info(number):
-    """Handle requests and return number properties."""
+    # Dynamically construct the properties list based on classifications
+    for prop, is_valid in classifications.items():
+        if is_valid:
+            properties.append(prop)
+
+    digit_sum = sum(int(digit) for digit in str(abs(int(number))))
+
+    # Generate the fun fact dynamically for Armstrong numbers
+    fun_fact = None
+    if classifications["armstrong"]:
+        fun_fact = f"{int(number)} is an Armstrong number because " + " + ".join(
+            [f"{d}^{len(str(int(number)))}" for d in str(abs(int(number)))]) + f" = {int(number)}"
+    
+    # Fetch a fun fact from the Numbers API
     try:
-        # Handle negative numbers and decimals
-        number = float(number)  # Convert to float to handle both negative and decimal inputs
-    except ValueError:
-        return jsonify({
-            "error": 'Bad Request: Invalid number format',
-            "number": number,
-            "error": True
-        }), 400  # 400 Bad Request
+        response = requests.get(f'http://numbersapi.com/{int(number)}/math?json=true', timeout=5)
+        if response.status_code == 200:
+            fun_fact = response.json().get('text', 'No fun fact found.')
+    except requests.RequestException:
+        fun_fact = "No fun fact found."
 
-    # If it's a negative number or floating-point, handle appropriately
-    if number < 0:
-        # We pass the absolute value of the number for properties, but show the actual number
-        number = round(number)  # Round the number for fun facts if it's a float
+    # Build the response dynamically
+    response_data = {
+        "number": number,
+        "is_prime": classifications["prime"],
+        "is_perfect": classifications["perfect"],
+        "properties": properties,
+        "digit_sum": digit_sum,
+        "fun_fact": fun_fact if fun_fact else "No fact found."
+    }
 
-    return jsonify(get_math_facts(int(number)))
-
+    return jsonify(response_data), 200
 
 # ---- Run Flask App ----
 if __name__ == '__main__':
