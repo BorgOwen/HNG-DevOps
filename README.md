@@ -56,7 +56,7 @@ GET http://127.0.0.1:5000/math/abc
 ### **1. Clone the Repository**
 ```bash
 git clone https://github.com/BorgOwen/HNG-DevOps.git
-cd app.py
+cd math.py
 ```
 
 ### **2. Create a Virtual Environment (Optional but Recommended)**
@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 ### **4. Run the Application**
 ```bash
-python app.py
+python math.py
 ```
 The API will be available at:
 ```bash

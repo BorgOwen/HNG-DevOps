@@ -47,16 +47,11 @@ def fetch_fun_fact(number):
 def get_math_facts(number):
     """Generate number properties and fetch a fun fact."""
     properties = []
-
-    # Armstrong check (only for valid Armstrong numbers)
+    
     if is_armstrong(number):
         properties.append("armstrong")
-    
-    # Odd/Even check
-    if number % 2 == 0:
-        properties.append("even")
-    else:
-        properties.append("odd")
+
+    properties.append("even" if number % 2 == 0 else "odd")
 
     return {
         "number": number,
@@ -71,10 +66,9 @@ def get_math_facts(number):
 @app.route('/math/<number>', methods=['GET'])
 def math_info(number):
     """Handle requests and return number properties."""
-    
-    # Handle invalid input: if the input is not a valid number, return 400 Bad Request
     try:
-        number = float(number)  # Try to convert the input to float to handle both negative and decimal inputs
+        # Handle negative numbers and decimals
+        number = float(number)  # Convert to float to handle both negative and decimal inputs
     except ValueError:
         return jsonify({
             "error": 'Bad Request: Invalid number format',
@@ -82,8 +76,11 @@ def math_info(number):
             "error": True
         }), 400  # 400 Bad Request
 
-    # Ensure we handle both negative and positive numbers
-    # If it's a negative number, properties like "armstrong" and "odd/even" should still work fine
+    # If it's a negative number or floating-point, handle appropriately
+    if number < 0:
+        # We pass the absolute value of the number for properties, but show the actual number
+        number = round(number)  # Round the number for fun facts if it's a float
+
     return jsonify(get_math_facts(int(number)))
 
 
