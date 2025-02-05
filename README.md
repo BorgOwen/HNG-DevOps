@@ -39,7 +39,7 @@ GET http://127.0.0.1:5000/math/371
 If the input is **not a valid number**, the API returns a `400 Bad Request`.
 #### **Example:**
 ```bash
-GET http://127.0.0.1:5000/math/abc
+GET https://b35e-102-89-23-14.ngrok-free.app/api/classify-number
 ```
 #### **Response:**
 ```json
@@ -76,7 +76,7 @@ python math.py
 ```
 The API will be available at:
 ```bash
-http://127.0.0.1:5000/math/<number>
+http://localhost:5000/api/classify-number?number=000
 ```
 
 ---

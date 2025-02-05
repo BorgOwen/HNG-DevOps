@@ -17,12 +17,20 @@ def is_prime(n):
             return False
     return True
 
+# def is_perfect(n):
+#     """Check if a number is a perfect number (sum of proper divisors equals the number)."""
+#     if not n.is_integer():
+#         return False
+#     n = int(n)
+#     return sum(i for i in range(1, n) if n % i == 0) == n
+
 def is_perfect(n):
     """Check if a number is a perfect number (sum of proper divisors equals the number)."""
-    if not n.is_integer():
+    if not n.is_integer() or n <= 0:  # Ensure it's a positive integer
         return False
     n = int(n)
     return sum(i for i in range(1, n) if n % i == 0) == n
+
 
 def is_armstrong(n):
     """Check if a number is an Armstrong number."""
