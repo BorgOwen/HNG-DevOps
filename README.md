@@ -92,11 +92,14 @@ Ensure you have the following installed:
 Install required dependencies using:
 ```bash
 pip install flask flask-cors requests
-
-```bash
-choco install ngrok
+```
 
 ---
+
+Install ngrok using:
+```bash
+choco install ngrok
+```
 
 ## Project Structure
 ```
