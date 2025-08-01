@@ -1,7 +1,19 @@
-# HNG-DevOps
-This is a repository for the tasks done during my HNG DevOps Internship. 
+# ⚙️ HNG DevOps Internship Tasks
 
-Task 2 was about creating a simple Flask-based API that takes a number as input and returns interesting mathematical properties along with a fun fact from the Numbers API.
+This repository contains tasks completed during my **HNG DevOps Internship**, showcasing my hands-on learning and practical implementation of DevOps tools and principles.
+
+### 🧪 Task 2: Flask-Based Numbers API Project
+
+In this task, I built a **simple Flask API** that:
+
+- Accepts a number as input via a GET request  
+- Returns interesting **mathematical properties** of the number  
+- Fetches a **fun fact** from the [Numbers API](http://numbersapi.com)
+
+This task strengthened my skills in:
+- Building and testing REST APIs with Flask
+- Consuming external APIs
+- Working with JSON and HTTP responses
 
 ---
 
